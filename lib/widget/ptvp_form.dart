@@ -7,10 +7,19 @@ import 'package:partrelate_desktop/model/paginated_respose.dart';
 import 'package:partrelate_desktop/model/part.dart';
 
 class PTVPForm extends StatefulWidget {
-  const PTVPForm({super.key, required this.vehiclePartId, this.onRefresh});
+  const PTVPForm(
+      {super.key,
+      this.onRefresh,
+      this.initPart,
+      this.initDescription,
+      this.initQuantity,
+      required this.handleSubmit});
 
-  final int vehiclePartId;
+  final Part? initPart;
+  final String? initDescription;
+  final String? initQuantity;
   final Function? onRefresh;
+  final Function(Part part, String description, String quantity) handleSubmit;
 
   @override
   State<PTVPForm> createState() => _PTVPFormState();
@@ -58,6 +67,16 @@ class _PTVPFormState extends State<PTVPForm> {
   @override
   void initState() {
     super.initState();
+    if (widget.initPart != null) {
+      selectedPart = widget.initPart!;
+      partController.text = widget.initPart!.name;
+    }
+    if (widget.initDescription != null && widget.initDescription!.isNotEmpty) {
+      descriptionController.text = widget.initDescription!;
+    }
+    if (widget.initQuantity != null && widget.initQuantity!.isNotEmpty) {
+      quantityController.text = widget.initQuantity!;
+    }
     partFocusNode = FocusNode();
     descriptionFocusNode = FocusNode();
   }
@@ -72,28 +91,17 @@ class _PTVPFormState extends State<PTVPForm> {
     super.dispose();
   }
 
+  onSubmit(String _) {
+    widget.handleSubmit(
+        selectedPart!, descriptionController.text, quantityController.text);
+
+    refreshState();
+
+    partFocusNode.requestFocus();
+  }
+
   @override
   Widget build(BuildContext context) {
-    Future<void> handleSubmit(String value) async {
-      try {
-        await dio.post('/parts_to_vehicle_parts', data: {
-          'description': descriptionController.text,
-          'quantity': quantityController.text,
-          'vehiclePartId': widget.vehiclePartId,
-          'partId': selectedPart!.id
-        });
-
-        refreshState();
-        partFocusNode.requestFocus();
-        if (widget.onRefresh != null) widget.onRefresh!();
-      } catch (e) {
-        if (!mounted) return;
-
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text(e.toString())));
-      }
-    }
-
     Future<Part?> createPart(String name) async {
       try {
         var response = await dio.post('/parts', data: {'name': name});
@@ -230,17 +238,16 @@ class _PTVPFormState extends State<PTVPForm> {
             decoration: decorationBuilder('Description'),
             controller: descriptionController,
             focusNode: descriptionFocusNode,
-            onSubmitted: handleSubmit,
+            onSubmitted: onSubmit,
           ),
         ),
         const SizedBox(width: 15),
         Expanded(
           flex: 1,
           child: TextField(
-            decoration: decorationBuilder('Quantity'),
-            controller: quantityController,
-            onSubmitted: handleSubmit,
-          ),
+              decoration: decorationBuilder('Quantity'),
+              controller: quantityController,
+              onSubmitted: onSubmit),
         ),
       ],
     );

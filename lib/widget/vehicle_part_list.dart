@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:partrelate_desktop/http/client.dart';
+import 'package:partrelate_desktop/model/part.dart';
 import 'package:partrelate_desktop/model/vehicle_part_detail.dart';
 import 'package:partrelate_desktop/page/vehicle_part_update.dart';
 import 'package:partrelate_desktop/widget/ptvp_detail.dart';
@@ -15,6 +16,25 @@ class VehiclePartList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Future<void> handleSubmit(Part part, String description, String quantity,
+        int vehiclePartId) async {
+      try {
+        await dio.post('/parts_to_vehicle_parts', data: {
+          'description': description,
+          'quantity': quantity,
+          'vehiclePartId': vehiclePartId,
+          'partId': part.id
+        });
+
+        if (onRefresh != null) onRefresh!();
+      } catch (e) {
+        if (!context.mounted) return;
+
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(e.toString())));
+      }
+    }
+
     return Card(
         child: ListView.builder(
             shrinkWrap: true,
@@ -100,8 +120,10 @@ class VehiclePartList extends StatelessWidget {
                   Padding(
                       padding: const EdgeInsets.all(15),
                       child: PTVPForm(
-                        vehiclePartId: vehiclePart.id!,
                         onRefresh: onRefresh,
+                        handleSubmit: (part, description, quantity) =>
+                            handleSubmit(
+                                part, description, quantity, vehiclePart.id!),
                       )),
                   const Divider(),
                   ListView.separated(
@@ -113,10 +135,12 @@ class VehiclePartList extends StatelessWidget {
                         var part = ptvp.part;
 
                         return PTVPDetail(
-                          name: part.name,
-                          description: ptvp.description,
-                          quantity: ptvp.quantity,
-                        );
+                            id: ptvp.id!,
+                            part: part,
+                            description: ptvp.description,
+                            quantity: ptvp.quantity,
+                            onRefresh: onRefresh,
+                            vehiclePartId: ptvp.vehiclePartId);
                       }),
                   if (vehiclePart.partsToVehicleParts.isNotEmpty)
                     const Divider()
