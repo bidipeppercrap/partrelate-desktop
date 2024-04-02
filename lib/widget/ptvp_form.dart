@@ -209,7 +209,7 @@ class _PTVPFormState extends State<PTVPForm> {
                                   AutocompleteHighlightedOption.of(context) ==
                                       index;
                               if (highlight) {
-                                SchedulerBinding.instance!
+                                SchedulerBinding.instance
                                     .addPostFrameCallback((Duration timeStamp) {
                                   Scrollable.ensureVisible(context,
                                       alignment: 0.5);
