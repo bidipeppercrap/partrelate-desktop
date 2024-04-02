@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:partrelate_desktop/page/home.dart';
+import 'package:partrelate_desktop/page/part.dart';
 import 'package:partrelate_desktop/page/vehicle.dart';
 
 class Route {
@@ -37,7 +38,7 @@ List<Route> routes = [
       selectedIcon: Icon(Icons.settings),
       labelText: 'Part',
       route: 'part',
-      page: HomePage())
+      page: PartPage())
 ];
 
 class MainLayoutNavigator extends StatelessWidget {

@@ -1,49 +1,49 @@
 import 'package:flutter/material.dart';
 import 'package:partrelate_desktop/http/client.dart';
 import 'package:partrelate_desktop/model/paginated_respose.dart';
-import 'package:partrelate_desktop/model/vehicle.dart';
-import 'package:partrelate_desktop/page/vehicle_create.dart';
+import 'package:partrelate_desktop/model/part.dart';
+import 'package:partrelate_desktop/page/part_create.dart';
 import 'package:partrelate_desktop/widget/pagination.dart';
+import 'package:partrelate_desktop/widget/part_list.dart';
 import 'package:partrelate_desktop/widget/searchbar_debounced.dart';
-import 'package:partrelate_desktop/widget/vehicle_list.dart';
 
-class VehiclePage extends StatefulWidget {
-  const VehiclePage({super.key});
+class PartPage extends StatefulWidget {
+  const PartPage({super.key});
 
   @override
-  State<VehiclePage> createState() => _VehiclePageState();
+  State<PartPage> createState() => _PartPageState();
 }
 
-class _VehiclePageState extends State<VehiclePage> {
+class _PartPageState extends State<PartPage> {
   String searchText = '';
   int currentPage = 1;
-  late Future<PaginatedResponse> vehicleFuture;
+  late Future<PaginatedResponse> partFuture;
 
-  Future<PaginatedResponse> fetchVehicle(
+  Future<PaginatedResponse> fetchPart(
       [String keyword = '', int page = 1]) async {
     var response = await dio
-        .get('/vehicles', queryParameters: {'page': page, 'keyword': keyword});
+        .get('/parts', queryParameters: {'page': page, 'keyword': keyword});
 
     return PaginatedResponse.fromJson(response.data);
   }
 
   void onSearch(String text) {
     setState(() {
-      vehicleFuture = fetchVehicle(text);
       currentPage = 1;
+      partFuture = fetchPart(text);
     });
   }
 
-  void refreshVehicle() {
+  void refreshPage() {
     setState(() {
-      vehicleFuture = fetchVehicle(searchText, currentPage);
+      partFuture = fetchPart(searchText, currentPage);
     });
   }
 
   @override
   void initState() {
     super.initState();
-    vehicleFuture = fetchVehicle(searchText);
+    partFuture = fetchPart(searchText);
   }
 
   @override
@@ -72,33 +72,32 @@ class _VehiclePageState extends State<VehiclePage> {
                       onPressed: () async {
                         final bool success = await Navigator.of(context).push(
                             MaterialPageRoute(
-                                builder: (context) =>
-                                    const VehicleCreatePage()));
+                                builder: (context) => const PartCreatePage()));
 
-                        if (success) refreshVehicle();
+                        if (success) refreshPage();
                       },
                       child: const Icon(Icons.add))
                 ],
               ),
               FutureBuilder<PaginatedResponse>(
-                  future: vehicleFuture,
+                  future: partFuture,
                   builder: (BuildContext context,
                       AsyncSnapshot<PaginatedResponse> snapshot) {
                     if (snapshot.hasData) {
-                      List<Vehicle> vehicles = [];
+                      List<Part> parts = [];
                       final totalPages = snapshot.data!.totalPages;
 
-                      for (var vehicle in snapshot.data!.data) {
-                        vehicles.add(Vehicle.fromJsonList(vehicle));
+                      for (var part in snapshot.data!.data) {
+                        parts.add(Part.fromJsonList(part));
                       }
 
                       return Column(children: [
                         const SizedBox(
                           height: 15,
                         ),
-                        VehicleList(
-                          vehicles: vehicles,
-                          onRefresh: refreshVehicle,
+                        PartList(
+                          parts: parts,
+                          onRefresh: refreshPage,
                         ),
                         const SizedBox(
                           height: 15,
@@ -107,8 +106,7 @@ class _VehiclePageState extends State<VehiclePage> {
                           onMovePage: (step) {
                             setState(() {
                               currentPage = currentPage + step;
-                              vehicleFuture =
-                                  fetchVehicle(searchText, currentPage);
+                              partFuture = fetchPart(searchText, currentPage);
                             });
                           },
                           disableNext: currentPage >= totalPages,
@@ -120,7 +118,7 @@ class _VehiclePageState extends State<VehiclePage> {
                     if (snapshot.hasError) {
                       return Center(
                           child: ElevatedButton(
-                              onPressed: refreshVehicle,
+                              onPressed: refreshPage,
                               child: const Icon(Icons.refresh)));
                     }
 
