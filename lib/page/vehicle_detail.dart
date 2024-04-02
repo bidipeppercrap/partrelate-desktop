@@ -62,9 +62,12 @@ class _VehicleDetailPageState extends State<VehicleDetailPage> {
                       child: Column(
                         children: [
                           VehicleDetailCard(
-                              name: vehicle.name,
-                              description: vehicle.description,
-                              note: vehicle.note),
+                            id: widget.vehicleId,
+                            name: vehicle.name,
+                            description: vehicle.description,
+                            note: vehicle.note,
+                            onRefresh: refreshVehicle,
+                          ),
                           const SizedBox(
                             height: 15,
                           ),

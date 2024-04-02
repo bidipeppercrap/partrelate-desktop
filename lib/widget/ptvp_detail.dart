@@ -12,6 +12,7 @@ class PTVPDetail extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
+      titleAlignment: ListTileTitleAlignment.top,
       title: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -57,6 +58,24 @@ class PTVPDetail extends StatelessWidget {
           ],
         ],
       ),
+      // trailing: MenuAnchor(
+      //   builder:
+      //       (BuildContext context, MenuController controller, Widget? child) {
+      //     return IconButton(
+      //         onPressed: () {
+      //           if (controller.isOpen) {
+      //             controller.close();
+      //           } else {
+      //             controller.open();
+      //           }
+      //         },
+      //         icon: const Icon(Icons.more_horiz));
+      //   },
+      //   menuChildren: <MenuItemButton>[
+      //     MenuItemButton(onPressed: () {}, child: const Icon(Icons.edit)),
+      //     MenuItemButton(onPressed: () {}, child: const Icon(Icons.delete)),
+      //   ],
+      // )
     );
   }
 }
