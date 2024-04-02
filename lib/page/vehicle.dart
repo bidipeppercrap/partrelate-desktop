@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:partrelate_desktop/http/client.dart';
 import 'package:partrelate_desktop/model/paginated_respose.dart';
 import 'package:partrelate_desktop/model/vehicle.dart';
+import 'package:partrelate_desktop/page/vehicle_create.dart';
 import 'package:partrelate_desktop/widget/pagination.dart';
 import 'package:partrelate_desktop/widget/searchbar_debounced.dart';
 import 'package:partrelate_desktop/widget/vehicle_list.dart';
@@ -56,9 +57,28 @@ class _VehiclePageState extends State<VehiclePage> {
           width: 800,
           child: Column(
             children: <Widget>[
-              SearchBarDebounced(
-                onSearch: onSearch,
-                onChanged: (text) => searchText = text,
+              Row(
+                children: [
+                  Expanded(
+                    child: SearchBarDebounced(
+                      onSearch: onSearch,
+                      onChanged: (text) => searchText = text,
+                    ),
+                  ),
+                  const SizedBox(
+                    width: 15,
+                  ),
+                  ElevatedButton(
+                      onPressed: () async {
+                        final bool success = await Navigator.of(context).push(
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    const VehicleCreatePage()));
+
+                        if (success) refreshVehicle();
+                      },
+                      child: const Icon(Icons.add))
+                ],
               ),
               FutureBuilder<PaginatedResponse>(
                   future: vehicleFuture,
@@ -82,7 +102,10 @@ class _VehiclePageState extends State<VehiclePage> {
                         const SizedBox(
                           height: 15,
                         ),
-                        VehicleList(vehicles: vehicles),
+                        VehicleList(
+                          vehicles: vehicles,
+                          onRefresh: refreshVehicle,
+                        ),
                         const SizedBox(
                           height: 15,
                         ),

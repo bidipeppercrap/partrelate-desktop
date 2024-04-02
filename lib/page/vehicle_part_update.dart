@@ -2,24 +2,26 @@ import 'package:flutter/material.dart';
 import 'package:partrelate_desktop/http/client.dart';
 import 'package:partrelate_desktop/widget/vehicle_form.dart';
 
-class VehicleUpdatePage extends StatefulWidget {
-  const VehicleUpdatePage(
+class VehiclePartUpdatePage extends StatefulWidget {
+  const VehiclePartUpdatePage(
       {super.key,
       required this.id,
       required this.name,
       required this.description,
-      required this.note});
+      required this.note,
+      required this.vehicleId});
 
   final int id;
   final String name;
   final String description;
   final String note;
+  final int vehicleId;
 
   @override
-  State<VehicleUpdatePage> createState() => _VehicleUpdatePageState();
+  State<VehiclePartUpdatePage> createState() => _VehiclePartUpdatePageState();
 }
 
-class _VehicleUpdatePageState extends State<VehicleUpdatePage> {
+class _VehiclePartUpdatePageState extends State<VehiclePartUpdatePage> {
   final nameController = TextEditingController();
   final descriptionController = TextEditingController();
   final noteController = TextEditingController();
@@ -46,10 +48,11 @@ class _VehicleUpdatePageState extends State<VehicleUpdatePage> {
   Widget build(BuildContext context) {
     Future<void> updateVehicleOrFailed() async {
       try {
-        await dio.put('/vehicles/${widget.id}', data: {
+        await dio.put('/vehicle_parts/${widget.id}', data: {
           'name': nameController.text,
           'description': descriptionController.text,
-          'note': noteController.text
+          'note': noteController.text,
+          'vehicleId': widget.vehicleId
         });
 
         if (!mounted) return;
@@ -70,7 +73,7 @@ class _VehicleUpdatePageState extends State<VehicleUpdatePage> {
             padding: const EdgeInsets.all(30),
             child: Column(
               children: [
-                Text('Updating Vehicle: ${widget.name}'),
+                Text('Updating Vehicle Part: ${widget.name}'),
                 const SizedBox(
                   height: 15,
                 ),

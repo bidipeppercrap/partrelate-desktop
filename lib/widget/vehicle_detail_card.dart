@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:partrelate_desktop/http/client.dart';
 import 'package:partrelate_desktop/page/vehicle_update.dart';
 import 'package:partrelate_desktop/widget/rounded_container.dart';
 
@@ -72,7 +73,11 @@ class VehicleDetailCard extends StatelessWidget {
                   width: 15,
                 ),
                 ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () async {
+                    await dio.delete('/vehicles/$id');
+
+                    Navigator.pop(context, true);
+                  },
                   style: const ButtonStyle(),
                   child: const Icon(Icons.delete),
                 )

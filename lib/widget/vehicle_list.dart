@@ -3,9 +3,10 @@ import 'package:partrelate_desktop/model/vehicle.dart';
 import 'package:partrelate_desktop/page/vehicle_detail.dart';
 
 class VehicleList extends StatelessWidget {
-  const VehicleList({super.key, required this.vehicles});
+  const VehicleList({super.key, required this.vehicles, this.onRefresh});
 
   final List<Vehicle> vehicles;
+  final Function? onRefresh;
 
   @override
   Widget build(BuildContext context) {
@@ -14,10 +15,13 @@ class VehicleList extends StatelessWidget {
       itemCount: vehicles.length,
       itemBuilder: (context, index) {
         return ListTile(
-          onTap: () {
-            Navigator.of(context).push(MaterialPageRoute(
-                builder: (context) =>
-                    VehicleDetailPage(vehicleId: vehicles[index].id!)));
+          onTap: () async {
+            final bool needRefresh = await Navigator.of(context).push(
+                MaterialPageRoute(
+                    builder: (context) =>
+                        VehicleDetailPage(vehicleId: vehicles[index].id!)));
+
+            if (needRefresh && onRefresh != null) onRefresh!();
           },
           title: Text(vehicles[index].name),
         );

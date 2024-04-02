@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:partrelate_desktop/http/client.dart';
 import 'package:partrelate_desktop/model/vehicle_part_detail.dart';
+import 'package:partrelate_desktop/page/vehicle_part_update.dart';
 import 'package:partrelate_desktop/widget/ptvp_detail.dart';
 import 'package:partrelate_desktop/widget/ptvp_form.dart';
 import 'package:partrelate_desktop/widget/rounded_container.dart';
@@ -59,12 +61,39 @@ class VehiclePartList extends StatelessWidget {
                     child: Row(
                       children: [
                         ElevatedButton(
-                            onPressed: () {}, child: const Icon(Icons.edit)),
+                            onPressed: () async {
+                              final success = await Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          VehiclePartUpdatePage(
+                                            vehicleId: vehiclePart.vehicleId,
+                                            id: vehiclePart.id!,
+                                            name: vehiclePart.name,
+                                            description:
+                                                vehiclePart.description ?? '',
+                                            note: vehiclePart.note ?? '',
+                                          )));
+                              if (success && onRefresh != null) onRefresh!();
+                            },
+                            child: const Icon(Icons.edit)),
                         const SizedBox(
                           width: 15,
                         ),
                         ElevatedButton(
-                            onPressed: () {}, child: const Icon(Icons.delete))
+                            onPressed: () async {
+                              try {
+                                await dio
+                                    .delete('/vehicle_parts/${vehiclePart.id}');
+
+                                if (onRefresh != null) onRefresh!();
+                              } catch (e) {
+                                if (!context.mounted) return;
+
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text(e.toString())));
+                              }
+                            },
+                            child: const Icon(Icons.delete))
                       ],
                     ),
                   ),
